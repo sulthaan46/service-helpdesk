@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Head } from '@inertiajs/react';
 import { FileText, HelpCircle, Search } from 'lucide-react';
-
+import { route } from 'ziggy-js';
+import { Link } from '@inertiajs/react';
 export default function Home() {
     return (
         <>
@@ -40,9 +41,11 @@ export default function Home() {
                                 </div>
                             </CardHeader>
                             <CardContent className="mt-6 p-0">
-                                <Button className="w-full border border-gray-300 bg-white text-black shadow transition-colors duration-300 hover:bg-blue-500 hover:text-white">
-                                    Buat Tiket Baru
-                                </Button>
+                                <Link href={route('ticket.create')}>
+                                    <Button className="w-full border border-gray-300 bg-white text-black shadow transition-colors duration-300 hover:bg-blue-500 hover:text-white">
+                                        Buat Tiket Baru
+                                    </Button>
+                                </Link>
                             </CardContent>
                         </Card>
                         <Card className="flex flex-col justify-between p-8 text-center">
