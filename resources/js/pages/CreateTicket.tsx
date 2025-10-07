@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +15,20 @@ import {
 import { Info } from 'lucide-react';
 
 export default function CreateTicket() {
+    const [opds, setOpds] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+        // Fetch OPD dan Kategori Masalah dari API
+        fetch('/api/tickets/options')
+            .then((response) => response.json())
+            .then((data) => {
+                setOpds(data.opds);
+                setCategories(data.categories);
+            })
+            .catch((error) => console.error('Error fetching options:', error));
+    }, []);
+
     const [fileName, setFileName] = useState<string>('No file selected');
     const [fileSizeError, setFileSizeError] = useState<string | null>(null);
     const MAX_BYTES = 5 * 1024 * 1024; // 10MB
@@ -83,10 +97,22 @@ export default function CreateTicket() {
                                 </div>
                                 {/* Organisasi Perangkat Daerah */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="opd">
-                                        Organisasi Perangkat Daerah
-                                    </Label>
-                                    <Input id="opd" placeholder="Nama OPD" />
+                                    <Label>Organisasi Perangkat Daerah</Label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih OPD" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {opds.map((opd) => (
+                                                <SelectItem
+                                                    key={opd.id}
+                                                    value={opd.id}
+                                                >
+                                                    {opd.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 {/* Prioritas */}
                                 <div className="space-y-2">
@@ -117,15 +143,14 @@ export default function CreateTicket() {
                                             <SelectValue placeholder="Pilih Kategori" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="jaringan">
-                                                Jaringan Intra Pemerintah
-                                            </SelectItem>
-                                            <SelectItem value="aaaaa">
-                                                aaaaaa
-                                            </SelectItem>
-                                            <SelectItem value="bbbbb">
-                                                bbbbbb
-                                            </SelectItem>
+                                            {categories.map((category) => (
+                                                <SelectItem
+                                                    key={category.id}
+                                                    value={category.id}
+                                                >
+                                                    {category.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
