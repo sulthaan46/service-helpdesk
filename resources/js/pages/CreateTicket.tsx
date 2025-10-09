@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { CircleAlert } from 'lucide-react';
 import {
     Select,
     SelectContent,
@@ -13,10 +14,22 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Info } from 'lucide-react';
+import { route } from 'ziggy-js';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function CreateTicket() {
     const [opds, setOpds] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        email: '',
+        whatsapp: '',
+        opd_id: '',
+        priority: '',
+        category_id: '',
+        description: '',
+        attachment: null as File | null,
+    });
 
     useEffect(() => {
         // Fetch OPD dan Kategori Masalah dari API
@@ -31,7 +44,7 @@ export default function CreateTicket() {
 
     const [fileName, setFileName] = useState<string>('No file selected');
     const [fileSizeError, setFileSizeError] = useState<string | null>(null);
-    const MAX_BYTES = 5 * 1024 * 1024; // 10MB
+    const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -49,12 +62,19 @@ export default function CreateTicket() {
             return;
         }
         setFileName(f.name);
+        setFileSizeError(null);
+        setData('attachment', f);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // placeholder: nanti pakai Inertia.post('/ticket/store', formData)
-        alert('Submit form - implement backend submit later');
+        console.log(data);
+
+        post(route('tickets.store'), {
+            headers: {
+                'Content-Type': 'multipart/form-data', // Pastikan header dikirim dengan tipe ini
+            },
+        });
     };
 
     return (
@@ -73,6 +93,25 @@ export default function CreateTicket() {
                             </p>
                         </CardHeader>
                         <CardContent className="space-y-6">
+                            {/* Display Error */}
+
+                            {Object.keys(errors).length > 0 && (
+                                <Alert>
+                                    <CircleAlert />
+                                    <AlertTitle>Errors!</AlertTitle>
+                                    <AlertDescription>
+                                        <ul>
+                                            {Object.entries(errors).map(
+                                                ([key, message]) => (
+                                                    <li key={key}>
+                                                        {message as string}
+                                                    </li>
+                                                ),
+                                            )}
+                                        </ul>
+                                    </AlertDescription>
+                                </Alert>
+                            )}
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 {/* Nama Lengkap */}
                                 <div className="space-y-2">
@@ -80,6 +119,10 @@ export default function CreateTicket() {
                                     <Input
                                         id="name"
                                         placeholder="Masukkan Nama Lengkap"
+                                        value={data.name}
+                                        onChange={(e) =>
+                                            setData('name', e.target.value)
+                                        }
                                     />
                                 </div>
                                 {/* Email */}
@@ -88,17 +131,33 @@ export default function CreateTicket() {
                                     <Input
                                         id="email"
                                         placeholder="Masukkan Email"
+                                        value={data.email}
+                                        onChange={(e) =>
+                                            setData('email', e.target.value)
+                                        }
                                     />
                                 </div>
                                 {/* Nomor WhatsApp */}
                                 <div className="space-y-2">
                                     <Label htmlFor="wa">No. WhatsApp</Label>
-                                    <Input id="wa" placeholder="08xxxxxxxxxx" />
+                                    <Input
+                                        id="wa"
+                                        placeholder="08xxxxxxxxxx"
+                                        value={data.whatsapp}
+                                        onChange={(e) =>
+                                            setData('whatsapp', e.target.value)
+                                        }
+                                    />
                                 </div>
                                 {/* Organisasi Perangkat Daerah */}
                                 <div className="space-y-2">
                                     <Label>Organisasi Perangkat Daerah</Label>
-                                    <Select>
+                                    <Select
+                                        value={data.opd_id}
+                                        onValueChange={(value) =>
+                                            setData('opd_id', value)
+                                        }
+                                    >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Pilih OPD" />
                                         </SelectTrigger>
@@ -106,7 +165,7 @@ export default function CreateTicket() {
                                             {opds.map((opd) => (
                                                 <SelectItem
                                                     key={opd.id}
-                                                    value={opd.id}
+                                                    value={String(opd.id)}
                                                 >
                                                     {opd.name}
                                                 </SelectItem>
@@ -117,7 +176,12 @@ export default function CreateTicket() {
                                 {/* Prioritas */}
                                 <div className="space-y-2">
                                     <Label>Prioritas</Label>
-                                    <Select>
+                                    <Select
+                                        value={data.priority}
+                                        onValueChange={(value) =>
+                                            setData('priority', value)
+                                        }
+                                    >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Pilih tingkat prioritas"></SelectValue>
                                         </SelectTrigger>
@@ -138,7 +202,12 @@ export default function CreateTicket() {
                                 {/* Kategori Masalah */}
                                 <div className="space-y-2">
                                     <Label>Kategori Masalah</Label>
-                                    <Select>
+                                    <Select
+                                        value={data.category_id}
+                                        onValueChange={(value) =>
+                                            setData('category_id', value)
+                                        }
+                                    >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Pilih Kategori" />
                                         </SelectTrigger>
@@ -146,7 +215,7 @@ export default function CreateTicket() {
                                             {categories.map((category) => (
                                                 <SelectItem
                                                     key={category.id}
-                                                    value={category.id}
+                                                    value={String(category.id)}
                                                 >
                                                     {category.name}
                                                 </SelectItem>
@@ -163,6 +232,10 @@ export default function CreateTicket() {
                                 <Textarea
                                     id="deskripsi"
                                     placeholder="jelaskan masalah anda..."
+                                    value={data.description}
+                                    onChange={(e) =>
+                                        setData('description', e.target.value)
+                                    }
                                 />
                             </div>
 
@@ -174,13 +247,13 @@ export default function CreateTicket() {
                                     <div className="grid gap-2">
                                         <div className="flex items-center gap-3 pt-2">
                                             <Label
-                                                htmlFor="file-upload"
+                                                htmlFor="attachment"
                                                 className="cursor-pointer rounded-md bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 shadow-sm hover:bg-blue-200"
                                             >
                                                 Browse...
                                             </Label>
                                             <Input
-                                                id="file-upload"
+                                                id="attachment"
                                                 name="attachment"
                                                 type="file"
                                                 className="hidden"
