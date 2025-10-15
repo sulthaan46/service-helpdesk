@@ -12,8 +12,13 @@ Route::get('/ticket/create', function () {
     return Inertia::render('CreateTicket');
 })->name('ticket.create');
 
+Route::get('/ticket/status', function () {
+    return Inertia::render('TicketStatusCheck');
+})->name('ticket.status');
+
 Route::get('/api/tickets/options', [TicketController::class, 'getOptions']);
 Route::post('/ticket/create',[TicketController::class, 'store'])->name('tickets.store');
+Route::get('/api/tickets/status', [TicketController::class,'getTicketDetail']);
 
 
 Route::middleware(['auth', 'verified'])->group(function () {

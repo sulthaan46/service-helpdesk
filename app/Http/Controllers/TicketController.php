@@ -53,5 +53,29 @@ class TicketController extends Controller
 
         return redirect()->route('home');
     }
+
+    public function getTicketDetail(Request $request)
+    {
+        $ticketId = $request->query('ticket_id');
+
+        $ticket = Ticket::where('ticket_id', $ticketId)->first();
+
+        if (!$ticket){
+            return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+        }
+
+        $ticketDetail = [
+            'ticket_id' => $ticket->ticket_id,
+            'status' => $ticket->status,
+            'priority' => $ticket->priority,
+            'created_at' =>$ticket->created_at->format('d/m/Y, H:i:s'),
+            'updated_at' =>$ticket->updated_at->format('d/m/Y, H:i:s'),
+            'name' => $ticket->name,
+            'email' => $ticket->email,
+            'whatsapp' => $ticket->whatsapp,
+            'description' => $ticket->description,
+        ];
+        return response()->json($ticketDetail);
+    }
    
 }

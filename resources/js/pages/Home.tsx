@@ -66,9 +66,11 @@ export default function Home() {
                                 </div>
                             </CardHeader>
                             <CardContent className="mt-6 p-0">
-                                <Button className="w-full border border-gray-300 bg-white text-black shadow transition-colors duration-300 hover:bg-green-500 hover:text-white">
-                                    Cek Status Tiket
-                                </Button>
+                                <Link href={route('ticket.status')}>
+                                    <Button className="w-full border border-gray-300 bg-white text-black shadow transition-colors duration-300 hover:bg-green-500 hover:text-white">
+                                        Cek Status Tiket
+                                    </Button>
+                                </Link>
                             </CardContent>
                         </Card>
                     </section>
