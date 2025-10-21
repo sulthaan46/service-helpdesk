@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/react';
 export default function Home() {
     return (
         <>
-            <Head title="Service Desc" />
+            <Head title="Service Helpdesc" />
             <div className="flex min-h-screen items-start justify-center bg-slate-50 py-16 dark:bg-slate-900">
                 <div className="w-full max-w-5xl px-4">
                     {/* {Heading} */}
@@ -91,7 +91,7 @@ export default function Home() {
                                     </p>
                                 </div>
                                 <a
-                                    href="#"
+                                    href={route('ticket.forgotPassword')}
                                     className="mt-3 text-sm text-blue-600 hover:underline"
                                 >
                                     Lupa ID Pelacakan

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Head } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 interface TicketDetail {
     ticket_id: string;
@@ -109,7 +110,7 @@ export default function TicketStatusCheck() {
                                                     Status:
                                                 </span>
                                                 <span
-                                                    className={`rounded-lg px-2 font-semibold text-white ${ticketDetail.status === 'baru' ? 'bg-blue-500' : ''} ${ticketDetail.status === 'Didelegasikan' ? 'bg-yellow-500' : ''} ${ticketDetail.status === 'Diproses' ? 'bg-orange-500' : ''} ${ticketDetail.status === 'Selesai' ? 'bg-green-500' : ''} `}
+                                                    className={`rounded-lg px-2 font-semibold text-white ${ticketDetail.status === 'baru' ? 'bg-blue-500' : ''} ${ticketDetail.status === 'didelegasikan' ? 'bg-yellow-500' : ''} ${ticketDetail.status === 'diproses' ? 'bg-orange-500' : ''} ${ticketDetail.status === 'selesai' ? 'bg-green-500' : ''} `}
                                                 >
                                                     {ticketDetail.status}
                                                 </span>
@@ -198,7 +199,10 @@ export default function TicketStatusCheck() {
                                     mendapatkan daftar tiket melalui email
                                 </p>
                                 <div className="mt-4">
-                                    <a href="/lupa-id" className="inline-block">
+                                    <a
+                                        href={route('ticket.forgotPassword')}
+                                        className="inline-block"
+                                    >
                                         <Button
                                             variant="outline"
                                             className="h-9"

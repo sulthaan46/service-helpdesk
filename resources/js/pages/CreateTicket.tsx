@@ -32,7 +32,6 @@ export default function CreateTicket() {
     });
 
     useEffect(() => {
-        // Fetch OPD dan Kategori Masalah dari API
         fetch('/api/tickets/options')
             .then((response) => response.json())
             .then((data) => {
@@ -44,7 +43,7 @@ export default function CreateTicket() {
 
     const [fileName, setFileName] = useState<string>('No file selected');
     const [fileSizeError, setFileSizeError] = useState<string | null>(null);
-    const MAX_BYTES = 10 * 1024 * 1024; // 10MB
+    const MAX_BYTES = 10 * 1024 * 1024;
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -58,7 +57,7 @@ export default function CreateTicket() {
             setFileSizeError(
                 'Ukuran file melebihi 10MB. Silahkan pilih file lebih kecil.',
             );
-            e.target.value = ''; // Clear the input
+            e.target.value = '';
             return;
         }
         setFileName(f.name);
@@ -68,11 +67,10 @@ export default function CreateTicket() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log(data);
 
         post(route('tickets.store'), {
             headers: {
-                'Content-Type': 'multipart/form-data', // Pastikan header dikirim dengan tipe ini
+                'Content-Type': 'multipart/form-data',
             },
         });
     };

@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TicketConfirmation;
+use App\Mail\TicketListMail;
 use App\Models\Category;
 use App\Models\Opd;
 use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TicketController extends Controller
 {
 
     public function getOptions()
     {
-        // Fetch options from the database or define them here
         $opds = Opd::all();
         $categories = Category::all();
 
@@ -49,9 +51,11 @@ class TicketController extends Controller
 
 
        
-        Ticket::create($validated);
+        $ticket = Ticket::create($validated);
 
-        return redirect()->route('home');
+        Mail::to($ticket->email)->send(new TicketConfirmation($ticket->ticket_id));
+
+        return redirect()->route('home')->with('success', 'Tiket berhasil dibuat!');
     }
 
     public function getTicketDetail(Request $request)
@@ -76,6 +80,35 @@ class TicketController extends Controller
             'description' => $ticket->description,
         ];
         return response()->json($ticketDetail);
+    }
+
+    public function sendList(Request $request)
+    {
+        $data = $request->validate([
+        'email' => 'required|email',
+        'type' => 'required|in:open,all',
+        ]);
+
+
+        $query = Ticket::where('email', $data['email']);
+
+
+        if ($data['type'] === 'open') {
+        $query->whereIn('status', ['baru', 'diproses']);
+        }
+
+
+        $tickets = $query->orderBy('created_at', 'desc')->get();
+
+
+        if ($tickets->isEmpty()) {
+        return back()->withErrors(['email' => 'Tidak ditemukan tiket untuk email ini.']);
+        }
+
+        Mail::to($data['email'])->queue(new TicketListMail($tickets));
+
+
+        return redirect()->route('home')->with('success', 'Daftar tiket akan dikirim ke email Anda. Periksa folder masuk/spam.');
     }
    
 }

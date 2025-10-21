@@ -16,9 +16,14 @@ Route::get('/ticket/status', function () {
     return Inertia::render('TicketStatusCheck');
 })->name('ticket.status');
 
+Route::get('/ticket/forgot-password', function () {
+    return Inertia::render('ForgotPassword');
+})->name('ticket.forgotPassword');
+
 Route::get('/api/tickets/options', [TicketController::class, 'getOptions']);
 Route::post('/ticket/create',[TicketController::class, 'store'])->name('tickets.store');
 Route::get('/api/tickets/status', [TicketController::class,'getTicketDetail']);
+Route::post('/tickets/send-list', [TicketController::class, 'sendList'])->name('tickets.sendList');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
