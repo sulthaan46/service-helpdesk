@@ -91,7 +91,7 @@ export default function Home() {
                                     </p>
                                 </div>
                                 <a
-                                    href={route('ticket.forgotPassword')}
+                                    href={route('ticket.forgotTicket')}
                                     className="mt-3 text-sm text-blue-600 hover:underline"
                                 >
                                     Lupa ID Pelacakan

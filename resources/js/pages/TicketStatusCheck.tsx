@@ -37,7 +37,6 @@ export default function TicketStatusCheck() {
         try {
             const params = new URLSearchParams({ ticket_id: ticketId.trim() });
             const url = `/api/tickets/status?${params.toString()}`;
-            console.log('Request URL:', url);
             const res = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -200,7 +199,7 @@ export default function TicketStatusCheck() {
                                 </p>
                                 <div className="mt-4">
                                     <a
-                                        href={route('ticket.forgotPassword')}
+                                        href={route('ticket.forgotTicket')}
                                         className="inline-block"
                                     >
                                         <Button

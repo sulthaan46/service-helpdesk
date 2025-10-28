@@ -38,6 +38,9 @@ class TicketController extends Controller
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:10240',
         ]);
 
+        $category = Category::with('operator')->findOrFail($validated['category_id']);
+        $operator_id = $category->operator ? $category->operator->id : null;
+
         if ($request->hasFile('attachment')) {
            $filePath = $request->file('attachment')->store('attachments', 'public');
             $validated['attachment'] = $filePath;
@@ -49,7 +52,7 @@ class TicketController extends Controller
         $ticketId = 'TICK-' . $today . '-' . str_pad($ticketNumber, 3, '0', STR_PAD_LEFT);
         $validated['ticket_id'] = $ticketId;
 
-
+        $validated['operator_id'] = $operator_id;
        
         $ticket = Ticket::create($validated);
 

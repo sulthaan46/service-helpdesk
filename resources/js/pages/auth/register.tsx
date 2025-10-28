@@ -9,8 +9,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { useState } from 'react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
-export default function Register() {
+interface Operator {
+    id: number;
+    name: string;
+}
+
+interface RegisterProps {
+    operators: Operator[];
+}
+
+export default function Register({ operators }: RegisterProps) {
+    const [operatorId, setOperatorId] = useState('');
     return (
         <AuthLayout
             title="Create an account"
@@ -88,6 +106,40 @@ export default function Register() {
                                 <InputError
                                     message={errors.password_confirmation}
                                 />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="operator_id">
+                                    Select Operator
+                                </Label>
+                                <Select
+                                    value={operatorId}
+                                    onValueChange={(value: string) =>
+                                        setOperatorId(value)
+                                    }
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="-- Select Operator --" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {operators.map((operator) => (
+                                            <SelectItem
+                                                key={operator.id}
+                                                value={String(operator.id)}
+                                            >
+                                                {operator.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <input
+                                    type="hidden"
+                                    name="operator_id"
+                                    value={operatorId}
+                                />
+
+                                <InputError message={errors.operator_id} />
                             </div>
 
                             <Button

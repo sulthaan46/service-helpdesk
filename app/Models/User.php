@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'operator_id',
     ];
 
     /**
@@ -45,5 +46,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function operator()
+    {
+        return $this->belongsTo(Operator::class);
     }
 }

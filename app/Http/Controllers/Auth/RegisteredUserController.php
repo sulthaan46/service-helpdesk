@@ -15,12 +15,17 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+
+   
     /**
      * Show the registration page.
      */
     public function create(): Response
     {
-        return Inertia::render('auth/register');
+         $operators = \App\Models\Operator::all();
+        return Inertia::render('auth/register', [
+        'operators' => $operators
+    ]);
     }
 
     /**
@@ -34,12 +39,14 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'operator_id' => 'required|exists:operators,id',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'operator_id' => $request->operator_id,
         ]);
 
         event(new Registered($user));
@@ -48,6 +55,8 @@ class RegisteredUserController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+         if ($user->role === 'admin') {
+            return redirect()->intended(route('admin.dashboard', absolute: false));  
+        } return redirect()->intended(route('operator.dashboard', absolute: false));
     }
 }

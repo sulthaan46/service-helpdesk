@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Mail } from 'lucide-react';
 import { route } from 'ziggy-js';
 
-export default function ForgotPassword() {
+export default function ForgotTicket() {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         type: 'open', // 'open' atau 'all'

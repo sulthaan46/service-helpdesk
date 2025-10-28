@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name','operator_id'];
+
+     public function operator()
+    {
+        return $this->belongsTo(Operator::class);
+    }
+
     public function tickets()
     {
         return $this->hasMany(Ticket::class, 'category_id');
