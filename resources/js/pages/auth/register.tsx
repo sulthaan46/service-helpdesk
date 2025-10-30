@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Select,
     SelectContent,
@@ -108,39 +108,41 @@ export default function Register({ operators }: RegisterProps) {
                                 />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="operator_id">
-                                    Select Operator
-                                </Label>
-                                <Select
-                                    value={operatorId}
-                                    onValueChange={(value: string) =>
-                                        setOperatorId(value)
-                                    }
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="-- Select Operator --" />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                        {operators.map((operator) => (
-                                            <SelectItem
-                                                key={operator.id}
-                                                value={String(operator.id)}
-                                            >
-                                                {operator.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <input
-                                    type="hidden"
-                                    name="operator_id"
-                                    value={operatorId}
-                                />
-
-                                <InputError message={errors.operator_id} />
-                            </div>
+                            {operators && operators.length > 0 ? (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="operator_id">
+                                        Select Operator
+                                    </Label>
+                                    <Select
+                                        value={operatorId}
+                                        onValueChange={(value: string) =>
+                                            setOperatorId(value)
+                                        }
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="-- Select Operator --" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {operators.map((operator) => (
+                                                <SelectItem
+                                                    key={operator.id}
+                                                    value={String(operator.id)}
+                                                >
+                                                    {operator.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <input
+                                        type="hidden"
+                                        name="operator_id"
+                                        value={operatorId}
+                                    />
+                                    <InputError message={errors.operator_id} />
+                                </div>
+                            ) : (
+                                <div>No operators available</div>
+                            )}
 
                             <Button
                                 type="submit"
