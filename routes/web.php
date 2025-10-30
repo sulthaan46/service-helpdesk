@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CategoryOperatorController;
 use App\Http\Controllers\Operator\DashboardController;
 use App\Http\Controllers\TicketController;
@@ -30,9 +31,7 @@ Route::get('/api/tickets/status', [TicketController::class,'getTicketDetail']);
 Route::post('/tickets/send-list', [TicketController::class, 'sendList'])->name('tickets.sendList');
 
 
-Route::middleware(['auth', 'verified',IsAdmin::class])->get('admin/dashboard',function(){
-   return Inertia::render('Admin/Dashboard'); 
-})->name('admin.dashboard');
+Route::middleware(['auth', 'verified',IsAdmin::class])->get('admin/dashboard',[AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
 Route::middleware(['auth', 'verified', IsAdmin::class])->get('admin/categories/create', [CategoryOperatorController::class, 'create'])->name('admin.categories.create');
 Route::middleware(['auth', 'verified', IsAdmin::class])->post('admin/categories', [CategoryOperatorController::class, 'store'])->name('admin.categories.store');

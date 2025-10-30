@@ -22,4 +22,11 @@ class Ticket extends Model
     {
         return $this->belongsTo(Operator::class);
     }
+
+    public function operatorUser()
+    {
+        return $this->hasOne(\App\Models\User::class, 'operator_id', 'operator_id')
+            ->where('role', 'operator');
+    }
+
 }
