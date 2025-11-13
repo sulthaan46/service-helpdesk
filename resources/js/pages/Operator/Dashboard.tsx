@@ -79,9 +79,8 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                             className={`rounded px-2 py-1 text-sm text-white ${
                                                 ticket.status === 'Open'
                                                     ? 'bg-green-500'
-                                                    : ticket.status ===
-                                                        'In Progress'
-                                                      ? 'bg-yellow-500'
+                                                    : ticket.status === 'baru'
+                                                      ? 'bg-blue-500'
                                                       : 'bg-gray-500'
                                             }`}
                                         >

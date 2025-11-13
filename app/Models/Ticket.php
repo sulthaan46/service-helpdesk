@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
-    protected $fillable = ['ticket_id','name','email','whatsapp','opd_id','priority','category_id','description','attachment','operator_id'];
+    protected $fillable = ['ticket_id','name','email','whatsapp','opd_id','priority','category_id','description','attachment','status','operator_id'];
 
      public function opd()
     {
@@ -27,6 +27,11 @@ class Ticket extends Model
     {
         return $this->hasOne(\App\Models\User::class, 'operator_id', 'operator_id')
             ->where('role', 'operator');
+    }
+
+    public function notes()
+    {
+        return $this->hasMany(TicketNote::class, 'ticket_id');
     }
 
 }

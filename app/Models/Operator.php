@@ -17,4 +17,9 @@ class Operator extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'operator_id');
+    }
 }

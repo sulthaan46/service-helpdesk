@@ -32,6 +32,8 @@ Route::post('/tickets/send-list', [TicketController::class, 'sendList'])->name('
 
 
 Route::middleware(['auth', 'verified',IsAdmin::class])->get('admin/dashboard',[AdminDashboardController::class, 'index'])->name('admin.dashboard');
+Route::put('/admin/tickets/{ticket}', [AdminDashboardController::class, 'updateTicket'])
+    ->name('admin.tickets.update');
 
 Route::middleware(['auth', 'verified', IsAdmin::class])->get('admin/categories/create', [CategoryOperatorController::class, 'create'])->name('admin.categories.create');
 Route::middleware(['auth', 'verified', IsAdmin::class])->post('admin/categories', [CategoryOperatorController::class, 'store'])->name('admin.categories.store');
