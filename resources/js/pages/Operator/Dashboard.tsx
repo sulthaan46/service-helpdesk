@@ -62,6 +62,9 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [ticketToUpdate, setTicketToUpdate] = useState<Ticket | null>(null);
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [isConfirmCompleteModalOpen, setIsConfirmCompleteModalOpen] =
+        useState(false);
+    const [isCompletingTicket, setIsCompletingTicket] = useState(false);
 
     const handleRowClick = (ticket: Ticket) => {
         const updatedTicket =
@@ -117,6 +120,53 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
     const handleCancelUpdateStatus = () => {
         setIsConfirmModalOpen(false);
         setTicketToUpdate(null);
+    };
+
+    const handleMarkAsCompleted = () => {
+        setIsConfirmCompleteModalOpen(true);
+    };
+
+    const handleConfirmComplete = async () => {
+        if (!selectedTicket) return;
+
+        setIsCompletingTicket(true);
+
+        try {
+            const response = await axios.post(
+                route('operator.updateStatus', {
+                    ticket: selectedTicket.id,
+                }),
+            );
+
+            if (response.data.success) {
+                // Update status di ticket menjadi 'selesai'
+                const completedTicket = {
+                    ...selectedTicket,
+                    status: 'selesai',
+                };
+
+                // Update ticketsList dengan status baru
+                setTicketsList((prevTickets) =>
+                    prevTickets.map((t) =>
+                        t.id === completedTicket.id ? completedTicket : t,
+                    ),
+                );
+
+                // Update selectedTicket
+                setSelectedTicket(completedTicket);
+
+                // Tutup modal konfirmasi
+                setIsConfirmCompleteModalOpen(false);
+            }
+        } catch (error) {
+            console.error('Gagal menandai tiket selesai:', error);
+        } finally {
+            setIsCompletingTicket(false);
+        }
+    };
+
+    const handleCancelComplete = () => {
+        setIsConfirmCompleteModalOpen(false);
     };
 
     const closeModal = () => {
@@ -348,27 +398,54 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                             Tambah Catatan Baru
                                         </h3>
                                         <textarea
-                                            className="w-full rounded-lg border border-gray-300 p-3 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            className={`w-full rounded-lg border p-3 text-sm text-gray-700 focus:ring-2 focus:outline-none ${
+                                                selectedTicket.status ===
+                                                'selesai'
+                                                    ? 'cursor-not-allowed border-gray-200 bg-gray-50'
+                                                    : 'border-gray-300 bg-white focus:ring-blue-500'
+                                            }`}
                                             rows={4}
-                                            placeholder="Tulis catatan baru terkait tiket ini..."
+                                            placeholder={
+                                                selectedTicket.status ===
+                                                'selesai'
+                                                    ? 'Tiket sudah selesai, tidak dapat menambah catatan baru'
+                                                    : 'Tulis catatan baru terkait tiket ini...'
+                                            }
                                             value={newNote}
                                             onChange={(e) =>
                                                 setNewNote(e.target.value)
+                                            }
+                                            disabled={
+                                                selectedTicket.status ===
+                                                'selesai'
+                                            }
+                                            readOnly={
+                                                selectedTicket.status ===
+                                                'selesai'
                                             }
                                         ></textarea>
                                         <div className="mt-1 flex justify-end">
                                             <button
                                                 onClick={handleSaveNote}
-                                                disabled={isSaving}
-                                                className={`rounded-lg ${
-                                                    isSaving
-                                                        ? 'bg-gray-400'
-                                                        : 'bg-blue-600'
-                                                } px-4 py-2 text-sm font-medium text-white hover:bg-blue-700`}
+                                                disabled={
+                                                    isSaving ||
+                                                    selectedTicket.status ===
+                                                        'selesai'
+                                                }
+                                                className={`rounded-lg px-4 py-2 text-sm font-medium text-white ${
+                                                    isSaving ||
+                                                    selectedTicket.status ===
+                                                        'selesai'
+                                                        ? 'cursor-not-allowed bg-gray-400'
+                                                        : 'bg-blue-600 hover:bg-blue-700'
+                                                }`}
                                             >
                                                 {isSaving
                                                     ? 'Menyimpan...'
-                                                    : 'Simpan Perubahan'}
+                                                    : selectedTicket.status ===
+                                                        'selesai'
+                                                      ? 'Tiket Selesai'
+                                                      : 'Simpan Perubahan'}
                                             </button>
                                         </div>
                                         {selectedTicket?.notes &&
@@ -475,16 +552,23 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                         </div>
                                     </div>
 
-                                    <div className="mt-3 rounded-b-xl border border-gray-300 bg-white p-4 shadow-sm">
-                                        <h3 className="text-xl font-semibold">
-                                            Aksi Cepat
-                                        </h3>
-                                        <div className="mt-4">
-                                            <button className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">
-                                                Tandai Selesai
-                                            </button>
+                                    {selectedTicket.status !== 'selesai' && (
+                                        <div className="mt-3 rounded-b-xl border border-gray-300 bg-white p-4 shadow-sm">
+                                            <h3 className="text-xl font-semibold">
+                                                Aksi Cepat
+                                            </h3>
+                                            <div className="mt-4">
+                                                <button
+                                                    onClick={
+                                                        handleMarkAsCompleted
+                                                    }
+                                                    className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                                                >
+                                                    Tandai Selesai
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -545,6 +629,56 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                 {isUpdatingStatus
                                     ? 'Memproses...'
                                     : 'Ya, Update Status'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Konfirmasi Tandai Selesai */}
+            {isConfirmCompleteModalOpen && selectedTicket && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+                    {/* overlay */}
+                    <div
+                        className="absolute inset-0 bg-black/40"
+                        onClick={handleCancelComplete}
+                    />
+
+                    {/* modal box */}
+                    <div className="relative z-10 mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg">
+                        <div className="px-6 py-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Konfirmasi Tandai Selesai
+                            </h3>
+                            <p className="mt-2 text-sm text-gray-600">
+                                Apakah Anda yakin ingin menandai tiket{' '}
+                                <span className="font-medium text-gray-900">
+                                    {selectedTicket.ticket_id}
+                                </span>{' '}
+                                sebagai selesai?
+                            </p>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
+                            <button
+                                onClick={handleCancelComplete}
+                                disabled={isCompletingTicket}
+                                className="rounded-lg bg-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-400 disabled:opacity-50"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleConfirmComplete}
+                                disabled={isCompletingTicket}
+                                className={`rounded-lg px-4 py-2 text-sm font-medium text-white ${
+                                    isCompletingTicket
+                                        ? 'cursor-not-allowed bg-gray-400'
+                                        : 'bg-green-600 hover:bg-green-700'
+                                }`}
+                            >
+                                {isCompletingTicket
+                                    ? 'Memproses...'
+                                    : 'Ya, Tandai Selesai'}
                             </button>
                         </div>
                     </div>

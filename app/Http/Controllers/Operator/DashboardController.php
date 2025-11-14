@@ -87,14 +87,23 @@ public function updateStatus(Request $request, $ticketId)
     if ($ticket->status === 'baru') {
         $ticket->status = 'diproses';
         $ticket->save();
-        
+
         return response()->json([
             'success' => true,
             'status' => $ticket->status,
             'message' => 'Status tiket berhasil diupdate'
         ]);
+    } elseif ($ticket->status === 'diproses') {
+        $ticket->status = 'selesai';
+        $ticket->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $ticket->status,
+            'message' => 'Tiket berhasil ditandai selesai'
+        ]);
     }
-    
+
     return response()->json([
         'success' => true,
         'status' => $ticket->status,
