@@ -12,6 +12,7 @@ import { BreadcrumbItem } from '@/types';
 import { route } from 'ziggy-js';
 import { useState } from 'react';
 import { Inertia } from '@inertiajs/inertia';
+import axios from 'axios';
 
 type Ticket = {
     id: number;
@@ -57,10 +58,13 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
     const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
     const [newNote, setNewNote] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [ticketsList, setTicketsList] = useState<Ticket[]>(tickets);
 
     const handleRowClick = (ticket: Ticket) => {
-        setSelectedTicket(ticket);
-        setIsModalOpen(true); // membuka modal saat row diklik
+        const updatedTicket =
+            ticketsList.find((t) => t.id === ticket.id) || ticket;
+        setSelectedTicket(updatedTicket);
+        setIsModalOpen(true);
     };
 
     const closeModal = () => {
@@ -77,16 +81,53 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
         setIsSaving(true);
 
         try {
-            // Kirim data ke backend
-            await Inertia.post(
+            if (!selectedTicket) {
+                console.error('Tiket tidak ditemukan');
+                return;
+            }
+            const response = await axios.post(
                 route('operator.addNote', { ticket: selectedTicket!.id }),
                 {
                     note: newNote,
                 },
             );
 
+            const {
+                id,
+                note,
+                created_at,
+                updated_at,
+                operator_id,
+                user,
+                operator,
+            } = response.data;
+
+            if (selectedTicket) {
+                const updatedTicket = {
+                    ...selectedTicket,
+                    notes: [
+                        ...(selectedTicket.notes || []),
+                        {
+                            id: id,
+                            note: note,
+                            user: user,
+                            operator: operator,
+                            operator_id: operator_id,
+                            created_at: created_at,
+                            updated_at: updated_at,
+                        },
+                    ],
+                };
+                setSelectedTicket(updatedTicket);
+
+                setTicketsList((prevTickets) =>
+                    prevTickets.map((ticket) =>
+                        ticket.id === updatedTicket.id ? updatedTicket : ticket,
+                    ),
+                );
+            }
+
             setNewNote('');
-            closeModal();
         } catch (error) {
             console.error('Gagal menambahkan catatan:', error);
         } finally {
@@ -111,7 +152,7 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tickets.map((ticket) => (
+                            {ticketsList.map((ticket) => (
                                 <TableRow
                                     key={ticket.id}
                                     className="transition-colors hover:bg-gray-50"

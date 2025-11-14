@@ -17,13 +17,12 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-    // Ambil operator name untuk title
     $operatorName = optional($user->operator)->name;
     
 
-    // Ambil tiket yang sesuai operator login
+    
     $tickets = Ticket::with(['opd:id,name', 'category:id,name',"notes.user", 'notes.operator'])
-        ->where('operator_id', $user->operator_id)  // hanya tiket yang operator_id sama dengan operator yang login
+        ->where('operator_id', $user->operator_id)  
         ->orderBy('created_at', 'desc')
         ->get();
 
@@ -36,24 +35,38 @@ class DashboardController extends Controller
     public function addNote(Request $request, $ticketId)
 {
     
-    // Validasi input
     $request->validate([
         'note' => 'required|string',
     ]);
 
-    // Ambil user yang sedang login
+
     $user = Auth::user();
 
-    // Menyimpan catatan baru
-    TicketNote::create([
+    
+    $note = TicketNote::create([
         'ticket_id' => $ticketId,
         'note' => $request->note,
-        'user_id' => $user->id,  // ID pengguna yang menambahkan catatan
-        'operator_id' => $user->operator_id,  // ID operator (jika ada)
+        'user_id' => $user->id,
+        'operator_id' => $user->operator_id,
     ]);
 
-    // Mengirim respons sukses
-    return back()->with('success', 'Catatan berhasil ditambahkan!');
+    $note->load('user', 'operator');
+
+    return response()->json([
+        'id' => $note->id,
+        'note' => $note->note,
+        'created_at' => $note->created_at,
+        'updated_at' => $note->updated_at,
+        'operator_id' => $note->operator_id,
+        'user' => [
+            'id' => $note->user->id,
+            'name' => $note->user->name,
+            'role' => $note->user->role,
+        ],
+        'operator' => $note->operator ? [
+            'name' => $note->operator->name,
+        ] : null,
+    ]);
 }
 
 
