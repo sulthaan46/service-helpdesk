@@ -23,15 +23,9 @@ class RegisteredUserController extends Controller
     public function create(): Response
     {
          $operators = \App\Models\Operator::all()->toArray();
-        $registeredOperators = \App\Models\User::pluck('operator_id')->toArray();
-
-    // Hapus operator yang sudah terdaftar dari daftar
-    $availableOperators = collect($operators)->filter(function ($operator) use ($registeredOperators) {
-        return !in_array($operator['id'], $registeredOperators);
-    })->values();
 
     return Inertia::render('auth/register', [
-        'operators' => $availableOperators,  // Kirim hanya operator yang belum terdaftar
+        'operators' => $operators,
     ]);
     }
 

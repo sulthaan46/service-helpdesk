@@ -14,7 +14,7 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::with(['opd:id,name','category:id,name','notes'])->get();
+        $tickets = Ticket::with(['opd:id,name','category:id,name','notes.user', 'notes.operator'])->get();
         $operators = Operator::with('users')->get(); 
 
         foreach ($tickets as $ticket) {

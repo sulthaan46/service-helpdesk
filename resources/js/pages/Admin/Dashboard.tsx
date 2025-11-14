@@ -32,7 +32,9 @@ type Ticket = {
     notes?: {
         id: number;
         note: string;
-        user?: { id: number; name: string };
+        user?: { id: number; name: string; role: 'admin' | 'operator' };
+        operator_id?: number;
+        operator?: { name: string };
         created_at: string;
         updated_at: string;
     }[];
@@ -259,33 +261,36 @@ export default function AdminDashboard({ tickets, operators }: Props) {
                                         {selectedTicket.notes &&
                                         selectedTicket.notes.length > 0 ? (
                                             <div className="max-h-48 overflow-y-auto">
-                                                {selectedTicket.notes.map(
-                                                    (note) => (
+                                                {selectedTicket.notes
+                                                    .slice()
+                                                    .reverse()
+                                                    .map((note) => (
                                                         <div
                                                             key={note.id}
                                                             className="mt-2 rounded-lg bg-gray-100 p-2"
                                                         >
-                                                            <div className="text-sm text-gray-600">
-                                                                <strong>
-                                                                    {note.user
-                                                                        ?.name ||
-                                                                        'Admin'}
-                                                                </strong>{' '}
-                                                                <span>-</span>{' '}
-                                                                <span className="text-xs text-gray-400">
-                                                                    {new Date(
-                                                                        note.created_at,
-                                                                    ).toLocaleDateString(
-                                                                        'id-ID',
-                                                                    )}
-                                                                </span>
-                                                            </div>
+                                                            <p className="text-xs">
+                                                                {note.user
+                                                                    ?.role ===
+                                                                'admin'
+                                                                    ? 'Admin'
+                                                                    : note.user
+                                                                            ?.role ===
+                                                                            'operator' &&
+                                                                        note.operator
+                                                                      ? `Operator ${note.operator.name}` // Menampilkan nama operator
+                                                                      : 'Pengguna Tidak Diketahui'}{' '}
+                                                                {new Date(
+                                                                    note.created_at,
+                                                                ).toLocaleString(
+                                                                    'id-ID',
+                                                                )}
+                                                            </p>
                                                             <p className="mt-1 text-sm">
                                                                 {note.note}
                                                             </p>
                                                         </div>
-                                                    ),
-                                                )}
+                                                    ))}
                                             </div>
                                         ) : (
                                             <p className="text-gray-500">

@@ -46,5 +46,9 @@ Route::middleware(['auth', 'verified', IsOperator::class])
     ->get('/operator/dashboard', [DashboardController::class, 'index'])
     ->name('operator.dashboard');
 
+Route::middleware(['auth', 'verified', IsOperator::class])
+    ->post('/operator/ticket/{ticket}/add-note', [DashboardController::class, 'addNote'])
+    ->name('operator.addNote');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

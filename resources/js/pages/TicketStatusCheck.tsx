@@ -15,6 +15,16 @@ interface TicketDetail {
     email: string;
     whatsapp: string;
     description: string;
+    notes: Array<{
+        id: number;
+        note: string;
+        created_at: string;
+        updated_at: string;
+        user: {
+            id: number;
+            name: string;
+        };
+    }>;
 }
 
 export default function TicketStatusCheck() {
@@ -167,6 +177,26 @@ export default function TicketStatusCheck() {
                                                             ticketDetail.description
                                                         }
                                                     </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col sm:col-span-2">
+                                                <span className="text-sm text-slate-600">
+                                                    Catatan Petugas
+                                                </span>
+                                                <div className="relative min-h-[60px] rounded-lg bg-blue-200 px-2 py-1">
+                                                    <p className="pt-3 pl-2 text-sm font-medium text-slate-900">
+                                                        {
+                                                            ticketDetail
+                                                                .notes[0].note
+                                                        }
+                                                    </p>
+                                                    <span className="absolute right-2 bottom-2 text-xs text-gray-600">
+                                                        {
+                                                            ticketDetail
+                                                                .notes[0]
+                                                                .updated_at
+                                                        }
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

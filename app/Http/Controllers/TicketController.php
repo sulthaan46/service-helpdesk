@@ -65,7 +65,9 @@ class TicketController extends Controller
     {
         $ticketId = $request->query('ticket_id');
 
-        $ticket = Ticket::where('ticket_id', $ticketId)->first();
+        $ticket = Ticket::where('ticket_id', $ticketId)->with(['notes' => function($query) {
+                        $query->latest()->take(1);
+                    }])->first();
 
         if (!$ticket){
             return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
@@ -81,6 +83,18 @@ class TicketController extends Controller
             'email' => $ticket->email,
             'whatsapp' => $ticket->whatsapp,
             'description' => $ticket->description,
+            'notes' => $ticket->notes->map(function($note) {
+            return [
+                'id' => $note->id,
+                'note' => $note->note,
+                'created_at' => $note->created_at->format('d/m/Y, H:i:s'),
+                'updated_at' => $note->updated_at->format('d/m/Y, H:i:s'),
+                'user' => [
+                    'id' => $note->user->id,  // Asumsi ada relasi 'user' pada TicketNote
+                    'name' => $note->user->name,
+                ],
+            ];
+        }),
         ];
         return response()->json($ticketDetail);
     }
