@@ -97,9 +97,24 @@ public function updateStatus(Request $request, $ticketId)
         $ticket->status = 'selesai';
         $ticket->save();
 
+        $adminUser = \App\Models\User::where('role', 'admin')->first();
+        $note = TicketNote::create([
+            'ticket_id' => $ticket->id,
+            'note' => 'Tiket Ditutup.',
+            'user_id' => $adminUser->id, 
+            'operator_id' => null, 
+        ]);
+
+        $note->load('user', 'operator');
+
+        $updatedTicket = Ticket::with(['opd:id,name', 'category:id,name', 'notes.user', 'notes.operator'])
+            ->where('operator_id', $user->operator_id)
+            ->find($ticket->id);
+
         return response()->json([
             'success' => true,
             'status' => $ticket->status,
+            'ticket' => $updatedTicket,
             'message' => 'Tiket berhasil ditandai selesai'
         ]);
     }

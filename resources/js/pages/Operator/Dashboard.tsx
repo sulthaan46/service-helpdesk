@@ -139,23 +139,16 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
             );
 
             if (response.data.success) {
-                // Update status di ticket menjadi 'selesai'
-                const completedTicket = {
-                    ...selectedTicket,
-                    status: 'selesai',
-                };
+                const updatedTicket = response.data.ticket;
 
-                // Update ticketsList dengan status baru
                 setTicketsList((prevTickets) =>
                     prevTickets.map((t) =>
-                        t.id === completedTicket.id ? completedTicket : t,
+                        t.id === updatedTicket.id ? updatedTicket : t,
                     ),
                 );
 
-                // Update selectedTicket
-                setSelectedTicket(completedTicket);
+                setSelectedTicket(updatedTicket);
 
-                // Tutup modal konfirmasi
                 setIsConfirmCompleteModalOpen(false);
             }
         } catch (error) {
