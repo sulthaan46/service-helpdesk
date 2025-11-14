@@ -59,12 +59,64 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
     const [newNote, setNewNote] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [ticketsList, setTicketsList] = useState<Ticket[]>(tickets);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [ticketToUpdate, setTicketToUpdate] = useState<Ticket | null>(null);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
     const handleRowClick = (ticket: Ticket) => {
         const updatedTicket =
             ticketsList.find((t) => t.id === ticket.id) || ticket;
-        setSelectedTicket(updatedTicket);
-        setIsModalOpen(true);
+        if (updatedTicket.status === 'baru') {
+            setTicketToUpdate(updatedTicket);
+            setIsConfirmModalOpen(true);
+        } else {
+            setSelectedTicket(updatedTicket);
+            setIsModalOpen(true);
+        }
+    };
+
+    const handleConfirmUpdateStatus = async () => {
+        if (!ticketToUpdate) return;
+
+        setIsUpdatingStatus(true);
+
+        try {
+            const response = await axios.post(
+                route('operator.updateStatus', {
+                    ticket: ticketToUpdate.id,
+                }),
+            );
+
+            if (response.data.success) {
+                const ticketWithNewStatus = {
+                    ...ticketToUpdate,
+                    status: response.data.status,
+                };
+                setTicketsList((prevTickets) =>
+                    prevTickets.map((t) =>
+                        t.id === ticketWithNewStatus.id
+                            ? ticketWithNewStatus
+                            : t,
+                    ),
+                );
+                setSelectedTicket(ticketWithNewStatus);
+            } else {
+                setSelectedTicket(ticketToUpdate);
+            }
+        } catch (error) {
+            console.error('Gagal mengupdate status tiket:', error);
+            setSelectedTicket(ticketToUpdate);
+        } finally {
+            setIsUpdatingStatus(false);
+            setIsConfirmModalOpen(false);
+            setTicketToUpdate(null);
+            setIsModalOpen(true);
+        }
+    };
+
+    const handleCancelUpdateStatus = () => {
+        setIsConfirmModalOpen(false);
+        setTicketToUpdate(null);
     };
 
     const closeModal = () => {
@@ -323,8 +375,8 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                         selectedTicket.notes.length > 0 ? (
                                             <div className="mt-2 max-h-48 overflow-y-auto">
                                                 {selectedTicket.notes
-                                                    .slice() // Membuat salinan array untuk mencegah perubahan data asli
-                                                    .reverse() // Membalikkan urutan catatan
+                                                    .slice()
+                                                    .reverse()
                                                     .map((note) => (
                                                         <div
                                                             key={note.id}
@@ -339,7 +391,7 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                                                             ?.role ===
                                                                             'operator' &&
                                                                         note.operator
-                                                                      ? `Operator ${note.operator.name}` // Menampilkan nama operator
+                                                                      ? `Operator ${note.operator.name}`
                                                                       : 'Pengguna Tidak Diketahui'}{' '}
                                                                 {new Date(
                                                                     note.created_at,
@@ -443,6 +495,56 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                 className="rounded-lg bg-gray-300 px-4 py-2 text-gray-700"
                             >
                                 Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Konfirmasi Update Status */}
+            {isConfirmModalOpen && ticketToUpdate && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+                    {/* overlay */}
+                    <div
+                        className="absolute inset-0 bg-black/40"
+                        onClick={handleCancelUpdateStatus}
+                    />
+
+                    {/* modal box */}
+                    <div className="relative z-10 mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg">
+                        <div className="px-6 py-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Konfirmasi Update Status
+                            </h3>
+                            <p className="mt-2 text-sm text-gray-600">
+                                Apakah Anda yakin ingin mengubah status tiket{' '}
+                                <span className="font-medium">
+                                    {ticketToUpdate.ticket_id}
+                                </span>{' '}
+                                dari "baru" menjadi "diproses"?
+                            </p>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
+                            <button
+                                onClick={handleCancelUpdateStatus}
+                                className="rounded-lg bg-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-400"
+                                disabled={isUpdatingStatus}
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleConfirmUpdateStatus}
+                                disabled={isUpdatingStatus}
+                                className={`rounded-lg px-4 py-2 text-sm font-medium text-white ${
+                                    isUpdatingStatus
+                                        ? 'cursor-not-allowed bg-gray-400'
+                                        : 'bg-blue-600 hover:bg-blue-700'
+                                }`}
+                            >
+                                {isUpdatingStatus
+                                    ? 'Memproses...'
+                                    : 'Ya, Update Status'}
                             </button>
                         </div>
                     </div>

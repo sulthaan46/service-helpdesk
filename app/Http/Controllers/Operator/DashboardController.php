@@ -69,5 +69,38 @@ class DashboardController extends Controller
     ]);
 }
 
+public function updateStatus(Request $request, $ticketId)
+{
+    $user = Auth::user();
+    
+    $ticket = Ticket::where('id', $ticketId)
+        ->where('operator_id', $user->operator_id)
+        ->first();
+    
+    if (!$ticket) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Tiket tidak ditemukan'
+        ], 404);
+    }
+    
+    if ($ticket->status === 'baru') {
+        $ticket->status = 'diproses';
+        $ticket->save();
+        
+        return response()->json([
+            'success' => true,
+            'status' => $ticket->status,
+            'message' => 'Status tiket berhasil diupdate'
+        ]);
+    }
+    
+    return response()->json([
+        'success' => true,
+        'status' => $ticket->status,
+        'message' => 'Status tiket tidak berubah'
+    ]);
+}
+
 
 }
