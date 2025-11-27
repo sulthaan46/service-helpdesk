@@ -183,21 +183,23 @@ export default function TicketStatusCheck() {
                                                 <span className="text-sm text-slate-600">
                                                     Catatan Petugas
                                                 </span>
-                                                <div className="relative min-h-[60px] rounded-lg bg-blue-200 px-2 py-1">
-                                                    <p className="pt-3 pl-2 text-sm font-medium text-slate-900">
-                                                        {
-                                                            ticketDetail
-                                                                .notes[0].note
-                                                        }
-                                                    </p>
-                                                    <span className="absolute right-2 bottom-2 text-xs text-gray-600">
-                                                        {
-                                                            ticketDetail
-                                                                .notes[0]
-                                                                .updated_at
-                                                        }
-                                                    </span>
-                                                </div>
+                                                {ticketDetail.notes
+                                                    .slice(0, 2)
+                                                    .map((note, index) => (
+                                                        <div
+                                                            key={note.id}
+                                                            className="relative mt-2 min-h-[60px] rounded-lg bg-blue-200 px-2 py-1"
+                                                        >
+                                                            <p className="pt-3 pl-2 text-sm font-medium text-slate-900">
+                                                                {note.note}
+                                                            </p>
+                                                            <span className="absolute right-2 bottom-2 text-xs text-gray-600">
+                                                                {
+                                                                    note.updated_at
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    ))}
                                             </div>
                                         </div>
                                     </div>

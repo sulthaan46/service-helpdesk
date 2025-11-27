@@ -72,6 +72,12 @@ export default function AdminDashboard({ tickets, operators }: Props) {
     );
     const [newNote, setNewNote] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [statusFilter, setStatusFilter] = useState('semua');
+
+    const filteredTickets =
+        statusFilter === 'semua'
+            ? tickets
+            : tickets.filter((ticket) => ticket.status === statusFilter);
 
     useEffect(() => {
         if (selectedTicket) {
@@ -146,6 +152,24 @@ export default function AdminDashboard({ tickets, operators }: Props) {
             <Head title="Admin Dashboard" />
 
             <div className="p-4">
+                <div className="mb-4 flex items-center justify-between">
+                    <div>
+                        <label className="mr-2 font-semibold">
+                            Filter by Status:
+                        </label>
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="rounded-md border border-gray-300 p-2"
+                        >
+                            <option value="semua">Semua</option>
+                            <option value="baru">Baru</option>
+                            <option value="didelegasikan">Didelegasikan</option>
+                            <option value="diproses">Diproses</option>
+                            <option value="selesai">Selesai</option>
+                        </select>
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     <Table className="min-w-[800px]">
                         <TableHeader>
@@ -159,7 +183,7 @@ export default function AdminDashboard({ tickets, operators }: Props) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {tickets.map((ticket) => (
+                            {filteredTickets.map((ticket) => (
                                 <TableRow
                                     key={ticket.id}
                                     className="transition-colors hover:bg-gray-50"

@@ -65,6 +65,12 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
     const [isConfirmCompleteModalOpen, setIsConfirmCompleteModalOpen] =
         useState(false);
     const [isCompletingTicket, setIsCompletingTicket] = useState(false);
+    const [statusFilter, setStatusFilter] = useState('semua');
+
+    const filteredTickets =
+        statusFilter === 'semua'
+            ? ticketsList
+            : ticketsList.filter((ticket) => ticket.status === statusFilter);
 
     const handleRowClick = (ticket: Ticket) => {
         const updatedTicket =
@@ -234,7 +240,24 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={title} />
             <div className="p-4">
-                <h2 className="mb-6 text-xl font-semibold">{title}</h2>
+                <div className="mb-4 flex items-center justify-between">
+                    <div>
+                        <label className="mr-2 font-semibold">
+                            Filter by Status:
+                        </label>
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="rounded-md border border-gray-300 p-2"
+                        >
+                            <option value="semua">Semua</option>
+                            <option value="baru">Baru</option>
+                            <option value="didelegasikan">Didelegasikan</option>
+                            <option value="diproses">Diproses</option>
+                            <option value="selesai">Selesai</option>
+                        </select>
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     <Table className="min-w-[800px]">
                         <TableHeader>
@@ -247,7 +270,7 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {ticketsList.map((ticket) => (
+                            {filteredTickets.map((ticket) => (
                                 <TableRow
                                     key={ticket.id}
                                     className="transition-colors hover:bg-gray-50"

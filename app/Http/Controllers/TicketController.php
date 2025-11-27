@@ -66,7 +66,7 @@ class TicketController extends Controller
         $ticketId = $request->query('ticket_id');
 
         $ticket = Ticket::where('ticket_id', $ticketId)->with(['notes' => function($query) {
-                        $query->latest()->take(1);
+                        $query->latest();
                     }])->first();
 
         if (!$ticket){
