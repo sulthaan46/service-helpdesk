@@ -42,6 +42,10 @@ Route::middleware(['auth', 'verified', IsAdmin::class])
     ->delete('admin/categories/{category}', [CategoryOperatorController::class, 'destroy'])
     ->name('admin.categories.destroy');
 
+Route::middleware(['auth', 'verified', IsAdmin::class])->get('admin/opds/create', [App\Http\Controllers\Admin\OpdController::class, 'create'])->name('admin.opds.create');
+Route::middleware(['auth', 'verified', IsAdmin::class])->post('admin/opds', [App\Http\Controllers\Admin\OpdController::class, 'store'])->name('admin.opds.store');
+Route::middleware(['auth', 'verified', IsAdmin::class])->delete('admin/opds/{opd}', [App\Http\Controllers\Admin\OpdController::class, 'destroy'])->name('admin.opds.destroy');
+
 Route::middleware(['auth', 'verified', IsOperator::class])
     ->get('/operator/dashboard', [DashboardController::class, 'index'])
     ->name('operator.dashboard');

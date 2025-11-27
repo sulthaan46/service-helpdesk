@@ -7,6 +7,9 @@ import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import axios from 'axios';
+import { Trash2, Pencil } from 'lucide-react';
+import { Icon } from '@/components/icon';
+import { BreadcrumbItem } from '@/types';
 
 interface Category {
     id: number;
@@ -20,6 +23,14 @@ interface Category {
 interface CreateCategoryOperatorProps {
     categories: Category[];
 }
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Admin Dashboard', href: route('admin.dashboard') },
+    {
+        title: 'Buat Kategori dan Operator',
+        href: route('admin.categories.create'),
+    },
+];
 
 const CreateCategoryOperator: React.FC<CreateCategoryOperatorProps> = ({
     categories,
@@ -143,7 +154,7 @@ const CreateCategoryOperator: React.FC<CreateCategoryOperatorProps> = ({
     };
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tambah Kategori dan Operator" />
 
             <div className="container p-3">
@@ -242,21 +253,27 @@ const CreateCategoryOperator: React.FC<CreateCategoryOperatorProps> = ({
                                     <td className="border px-4 py-2 text-center">
                                         <Button
                                             type="button"
-                                            className="text-sm"
+                                            className="bg-transparent p-1 hover:bg-blue-50"
                                             onClick={() =>
                                                 openEditModal(category)
                                             }
                                         >
-                                            Edit
+                                            <Icon
+                                                iconNode={Pencil}
+                                                className="text-blue-500"
+                                            />
                                         </Button>
                                         <Button
                                             type="button"
-                                            className="ml-2 text-sm text-red-500"
+                                            className="ml-2 bg-transparent p-1 hover:bg-red-50"
                                             onClick={() =>
                                                 handleDelete(category.id)
                                             }
                                         >
-                                            Hapus
+                                            <Icon
+                                                iconNode={Trash2}
+                                                className="text-red-500"
+                                            />
                                         </Button>
                                     </td>
                                 </tr>
