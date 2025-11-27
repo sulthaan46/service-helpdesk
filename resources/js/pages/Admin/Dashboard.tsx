@@ -98,6 +98,9 @@ export default function AdminDashboard({ tickets, operators }: Props) {
     const handleOperatorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedOperatorId = e.target.value;
         setOperator(selectedOperatorId);
+        if (selectedOperatorId) {
+            setStatus('didelegasikan');
+        }
         const selectedOperator = operators.find(
             (op) => op.id.toString() === selectedOperatorId,
         );

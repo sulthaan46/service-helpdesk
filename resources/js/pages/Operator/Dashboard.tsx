@@ -69,7 +69,7 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
     const handleRowClick = (ticket: Ticket) => {
         const updatedTicket =
             ticketsList.find((t) => t.id === ticket.id) || ticket;
-        if (updatedTicket.status === 'baru') {
+        if (['baru', 'didelegasikan'].includes(updatedTicket.status)) {
             setTicketToUpdate(updatedTicket);
             setIsConfirmModalOpen(true);
         } else {
@@ -598,7 +598,8 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                 <span className="font-medium">
                                     {ticketToUpdate.ticket_id}
                                 </span>{' '}
-                                dari "baru" menjadi "diproses"?
+                                dari "{ticketToUpdate.status}" menjadi
+                                "diproses"?
                             </p>
                         </div>
 

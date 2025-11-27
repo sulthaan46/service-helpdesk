@@ -84,7 +84,7 @@ public function updateStatus(Request $request, $ticketId)
         ], 404);
     }
     
-    if ($ticket->status === 'baru') {
+    if (in_array($ticket->status, ['baru', 'didelegasikan'])) {
         $ticket->status = 'diproses';
         $ticket->save();
 
@@ -93,16 +93,16 @@ public function updateStatus(Request $request, $ticketId)
             'status' => $ticket->status,
             'message' => 'Status tiket berhasil diupdate'
         ]);
-    } elseif ($ticket->status === 'diproses') {
+    } elseif (in_array($ticket->status, ['diproses', 'didelegasikan'])) {
         $ticket->status = 'selesai';
         $ticket->save();
 
         $adminUser = \App\Models\User::where('role', 'admin')->first();
         $note = TicketNote::create([
             'ticket_id' => $ticket->id,
-            'note' => 'Tiket Ditutup.',
-            'user_id' => $adminUser->id, 
-            'operator_id' => null, 
+            'note' => 'Tiket Ditutup. Masalah Selesai.',
+            'user_id' => $adminUser->id,
+            'operator_id' => null,
         ]);
 
         $note->load('user', 'operator');

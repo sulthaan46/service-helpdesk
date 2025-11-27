@@ -33,14 +33,12 @@ class AdminDashboardController extends Controller
     public function updateTicket(Request $request, Ticket $ticket)
 {
 
-    // Validasi request
     $data = $request->validate([
         'status' => 'required|string',
         'operator_id' => 'nullable|exists:operators,id',
         'note' => 'nullable|string',
     ]);
 
-    // Update ticket
     $ticket->update([
         'status' => $data['status'],
         'operator_id' => $data['operator_id'] ?? $ticket->operator_id,
