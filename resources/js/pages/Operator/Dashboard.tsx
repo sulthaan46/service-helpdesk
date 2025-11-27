@@ -390,7 +390,7 @@ export default function OperatorDashboard({ tickets, operatorName }: Props) {
                                         </h3>
                                         {selectedTicket?.attachment ? (
                                             <a
-                                                href={selectedTicket.attachment}
+                                                href={`/storage/${selectedTicket.attachment}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-sm text-blue-600 hover:underline"

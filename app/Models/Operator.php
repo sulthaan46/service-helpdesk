@@ -10,7 +10,7 @@ class Operator extends Model
 
     public function categories()
     {
-       return $this->hasMany(Category::class, 'operator_id')->onDelete('cascade');
+       return $this->hasMany(Category::class, 'operator_id');
     }
 
     public function tickets()

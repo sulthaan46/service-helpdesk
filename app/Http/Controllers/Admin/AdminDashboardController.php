@@ -39,10 +39,20 @@ class AdminDashboardController extends Controller
         'note' => 'nullable|string',
     ]);
 
-    $ticket->update([
+    $updateData = [
         'status' => $data['status'],
         'operator_id' => $data['operator_id'] ?? $ticket->operator_id,
-    ]);
+    ];
+
+    if ($data['operator_id']) {
+        $operator = Operator::find($data['operator_id']);
+        $category = $operator->categories()->first();
+        if ($category) {
+            $updateData['category_id'] = $category->id;
+        }
+    }
+
+    $ticket->update($updateData);
 
     if (!empty($data['note'])) {
             \App\Models\TicketNote::create([
